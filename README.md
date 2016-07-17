@@ -183,4 +183,5 @@ PS：构造函数省略了。。。
 # 最后看下效果 #
 
 　　还可以吧，有很多需要改进的地方，以后再实现一个可以复用的adpter给大家吧。
-<iframe height=800 width=500 src="GIF.gif">
+
+<iframe height=800 width=500 src="TreeRecyclerAdapter/GIF.gif">
