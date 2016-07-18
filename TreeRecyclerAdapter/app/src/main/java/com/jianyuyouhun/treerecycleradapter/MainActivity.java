@@ -40,22 +40,18 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickLitener(new TreeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String type = list.get(position).getClass().getName();//获取当前类名
-                String parent_class = ParentEntity.class.getName();//父类名
-                String child_class = ParentEntity.ChildEntity.class.getName();//子类名
-                if (type.equals(parent_class)){//判断是否为父
+                if (list.get(position) instanceof ParentEntity){//判断是否为父
                     ParentEntity parent = (ParentEntity) list.get(position);
                     if ((position + 1) == list.size()) {//判断是否为最后一个元素
                         adapter.addAllChild(parent.getChildren(), position + 1);
                     } else {
-                        String type_next = list.get(position + 1).getClass().getName();//下一个元素的类名
-                        if (type_next.equals(parent_class)) {//如果是父则表示为折叠状态需要添加儿子
+                        if (list.get(position + 1) instanceof ParentEntity) {//如果是父则表示为折叠状态需要添加儿子
                             adapter.addAllChild(parent.getChildren(), position + 1);
-                        } else if (type_next.equals(child_class)) {//如果是儿子则表示为展开状态需要删除儿子
+                        } else if (list.get(position + 1) instanceof ParentEntity.ChildEntity) {//如果是儿子则表示为展开状态需要删除儿子
                             adapter.deleteAllChild(position + 1, parent.getChildren().size());
                         }
                     }
-                }else if (type.equals(child_class)){//是儿子你想干啥就干啥吧
+                }else {//是儿子你想干啥就干啥吧
                     ParentEntity.ChildEntity child = (ParentEntity.ChildEntity) list.get(position);
                     Toast.makeText(getApplicationContext(), child.getName(), Toast.LENGTH_SHORT).show();
                 }

@@ -46,20 +46,18 @@ public class TreeAdapter extends RecyclerView.Adapter<TreeAdapter.MyViewHolder>{
 
     @Override
     public void onBindViewHolder(final TreeAdapter.MyViewHolder holder, int position) {
-        String type = list.get(position).getClass().getName();
-        String parent_class = ParentEntity.class.getName();
-        String child_class = ParentEntity.ChildEntity.class.getName();
-        if (type.equals(parent_class)){
+        if (list.get(position) instanceof ParentEntity){
             holder.child_name.setVisibility(View.GONE);
             holder.parent_name.setVisibility(View.VISIBLE);
             ParentEntity parent = (ParentEntity) list.get(position);
             holder.parent_name.setText(parent.getName());
-        }else if (type.equals(child_class)){
+        }else {
             holder.parent_name.setVisibility(View.GONE);
             holder.child_name.setVisibility(View.VISIBLE);
             ParentEntity.ChildEntity child = (ParentEntity.ChildEntity) list.get(position);
             holder.child_name.setText(child.getName());
         }
+
         if (onItemClickListener != null) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
