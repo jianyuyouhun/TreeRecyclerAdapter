@@ -17,9 +17,9 @@
 	       private String name;
 	    }
 	}
-PS：构造函数省略了。。。
+PS：构造函数省略了。。。 Parent和Child都只拥有id和name，但是其实这是两个不同的实体，因为如果绑定的数据是一个格式的，只是深度不一样的话，那就完全采用另外一种实现方法了，github上太多太多。
 
-# 然后是实现 #
+# 实现过程 #
 
 ## 第一步，adpter ##
 　　如何实现数据的绑定就不多讲了，demo里面的item添加效果使用了开源项目[recyclerview-animators](https://github.com/wasabeef/recyclerview-animators)
@@ -64,20 +64,17 @@ PS：构造函数省略了。。。
 	
 	    @Override
 	    public void onBindViewHolder(final TreeAdapter.MyViewHolder holder, int position) {
-	        String type = list.get(position).getClass().getName();
-	        String parent_class = ParentEntity.class.getName();
-	        String child_class = ParentEntity.ChildEntity.class.getName();
-	        if (type.equals(parent_class)){
-	            holder.child_name.setVisibility(View.GONE);
-	            holder.parent_name.setVisibility(View.VISIBLE);
-	            ParentEntity parent = (ParentEntity) list.get(position);
-	            holder.parent_name.setText(parent.getName());
-	        }else if (type.equals(child_class)){
-	            holder.parent_name.setVisibility(View.GONE);
-	            holder.child_name.setVisibility(View.VISIBLE);
-	            ParentEntity.ChildEntity child = (ParentEntity.ChildEntity) list.get(position);
-	            holder.child_name.setText(child.getName());
-	        }
+			if (list.get(position) instanceof ParentEntity){//判断当前实体是否是Parent的实例
+		        holder.child_name.setVisibility(View.GONE);
+		        holder.parent_name.setVisibility(View.VISIBLE);
+		        ParentEntity parent = (ParentEntity) list.get(position);
+		        holder.parent_name.setText(parent.getName());
+		    }else {//判断当前实体是否是Child的实例
+		        holder.parent_name.setVisibility(View.GONE);
+		        holder.child_name.setVisibility(View.VISIBLE);
+		        ParentEntity.ChildEntity child = (ParentEntity.ChildEntity) list.get(position);
+		        holder.child_name.setText(child.getName());
+		    }
 	    }
 	
 	    @Override
@@ -96,10 +93,10 @@ PS：构造函数省略了。。。
 	    }
 	}
 
-　　layout和to是r文件绑定用到的，可以不用写，直接在onCreateViewHolder和MyViewHolder中写上就行了，我个人是习惯把这些都放到activity中去声明然后传进来。
+　　layout和to是R文件绑定用到的，可以不用写，直接在onCreateViewHolder和MyViewHolder中写上就行了，我个人是习惯把这些都放到activity中去声明然后传进来。
 
-　　然后关键是利用了java的getClass().getName()，我们知道java是可以在运行时候再去获取加载类的类型的，所以我们定义的list是一个不指定数据类型的list，然后在onBindViewHolder中去获取当前位置的实体的类型，是Parent还是Child,然后做出具体的数据绑定操作，这里我的layout采用了framelayout来实现，可以更改为两个layout，不过项目越大，你的layout文件夹下面一大堆文件看上去也是挺累的呢，所以能省就省吧。
-## 第二步 增加点击事件和增加删除事件 ##
+　　我们知道java是可以在运行时候再去获取加载类的类型的，所以我们定义的list是一个不指定数据类型的list，然后在onBindViewHolder中去获取当前位置的实体的类型，是Parent还是Child,然后做出具体的数据绑定操作，这里我的layout采用了framelayout来实现，可以更改为两个layout，不过项目越大，你的layout文件夹下面一大堆文件看上去也是挺累的呢，所以能省就省吧。
+## 第二步 item点击事件和增加删除方法 ##
 
 　　我们知道，recyclerview只负责视图绑定，事件与它无关，我们需要自己实现点击事件。然后就是点击展开时候把子数据动态添加进去，点击折叠时把子数据动态删除。需要两个方法。
 
@@ -127,7 +124,7 @@ PS：构造函数省略了。。。
 	    });
 	}
 	
-　　当然增加和删除事件不可少
+　　当然增加和删除不可少
 
 	/**
      * 添加所有child
@@ -158,22 +155,18 @@ PS：构造函数省略了。。。
 	adapter.setOnItemClickLitener(new TreeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String type = list.get(position).getClass().getName();//获取当前类名
-                String parent_class = ParentEntity.class.getName();//父类名
-                String child_class = ParentEntity.ChildEntity.class.getName();//子类名
-                if (type.equals(parent_class)){//判断是否为父
+				if (list.get(position) instanceof ParentEntity){//判断是否为父
                     ParentEntity parent = (ParentEntity) list.get(position);
                     if ((position + 1) == list.size()) {//判断是否为最后一个元素
                         adapter.addAllChild(parent.getChildren(), position + 1);
                     } else {
-                        String type_next = list.get(position + 1).getClass().getName();//下一个元素的类名
-                        if (type_next.equals(parent_class)) {//如果是父则表示为折叠状态需要添加儿子
+                        if (list.get(position + 1) instanceof ParentEntity) {//如果是父则表示为折叠状态需要添加儿子
                             adapter.addAllChild(parent.getChildren(), position + 1);
-                        } else if (type_next.equals(child_class)) {//如果是儿子则表示为展开状态需要删除儿子
+                        } else if (list.get(position + 1) instanceof ParentEntity.ChildEntity) {//如果是儿子则表示为展开状态需要删除儿子
                             adapter.deleteAllChild(position + 1, parent.getChildren().size());
                         }
                     }
-                }else if (type.equals(child_class)){//是儿子你想干啥就干啥吧
+                }else {//是儿子你想干啥就干啥吧
                     ParentEntity.ChildEntity child = (ParentEntity.ChildEntity) list.get(position);
                     Toast.makeText(getApplicationContext(), child.getName(), Toast.LENGTH_SHORT).show();
                 }
