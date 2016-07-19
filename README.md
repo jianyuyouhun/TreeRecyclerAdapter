@@ -150,7 +150,7 @@ PS：构造函数省略了。。。 Parent和Child都只拥有id和name，但是
 
 ### 第三步 点击事件 ###
 
-　　我们要先知道我们点击的是父还是子，这里同样采用getClass().getName()方法来进行区别。实现如下
+　　我们要先知道我们点击的是父还是子，这里同样对实体的类型进行判断。实现如下
 
 	adapter.setOnItemClickLitener(new TreeAdapter.OnItemClickListener() {
             @Override
