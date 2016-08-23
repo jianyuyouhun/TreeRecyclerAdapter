@@ -177,4 +177,6 @@ PS：构造函数省略了。。。 Parent和Child都只拥有id和name，但是
 
 　　还可以吧，有很多需要改进的地方，以后再实现一个可以复用的adpter给大家吧。
 
+　　有兴趣去看下我的[个人部落](https://jianyuyouhun.com)吧
+
 <img src="TreeRecyclerAdapter/GIF.gif">
